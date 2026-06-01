@@ -1,11 +1,11 @@
 info:
-  name: Untitled
+  name: Finds Pets by status
   type: http
   seq: 1
 
 http:
   method: GET
-  url: https://petstore3.swagger.io/api/v3/pet/findByStatus?status=available
+  url: "{{baseURL}}/pet/findByStatus?status=available"
   params:
     - name: status
       value: available
@@ -17,3 +17,5 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: Multiple status values can be provided with comma separated strings.
