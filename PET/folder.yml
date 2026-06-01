@@ -1,0 +1,7 @@
+info:
+  name: PET
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit
