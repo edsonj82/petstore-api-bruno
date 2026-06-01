@@ -1,0 +1,38 @@
+info:
+  name: Add a new pet to the store
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseURL}}/pet"
+  body:
+    type: json
+    data: |-
+      {
+        "id": 10,
+        "name": "doggie",
+        "category": {
+          "id": 1,
+          "name": "Dogs"
+        },
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "available"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Create a new pet in the store
