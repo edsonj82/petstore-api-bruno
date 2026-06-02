@@ -1,0 +1,27 @@
+info:
+  name: Update a pet to in the store with form data
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseURL}}/pet/123456789?name=Pepe&status=available"
+  params:
+    - name: name
+      value: Pepe
+      type: query
+    - name: status
+      value: available
+      type: query
+  body:
+    type: json
+    data: ""
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Create a new pet in the store
