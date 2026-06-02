@@ -1,5 +1,5 @@
 info:
-  name: Find pet by ID2
+  name: Validate pet name by ID
   type: http
   seq: 9
 
