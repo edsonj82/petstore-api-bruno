@@ -1,11 +1,11 @@
 info:
   name: Delete a pet
   type: http
-  seq: 8
+  seq: 10
 
 http:
   method: DELETE
-  url: "{{baseURL}}/pet/123456789"
+  url: "{{baseURL}}/pet/{{petId}}"
   body:
     type: json
     data: ""

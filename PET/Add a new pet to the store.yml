@@ -29,6 +29,17 @@ http:
       }
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const responseData  = res.getBody();
+
+        if(responseData && responseData.id){
+          bru.setEnvVar("petId", responseData.id)
+          bru.setEnvVar("status", responseData.status)
+        }
+
 settings:
   encodeUrl: true
   timeout: 0

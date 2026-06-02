@@ -1,14 +1,14 @@
 info:
   name: Update a pet to in the store with form data
   type: http
-  seq: 6
+  seq: 8
 
 http:
   method: POST
-  url: "{{baseURL}}/pet/123456789?name=Pepe&status=available"
+  url: "{{baseURL}}/pet/{{petId}}?name=Miny&status=available"
   params:
     - name: name
-      value: Pepe
+      value: Miny
       type: query
     - name: status
       value: available
