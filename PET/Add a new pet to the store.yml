@@ -36,8 +36,8 @@ runtime:
         const responseData  = res.getBody();
 
         if(responseData && responseData.id){
-          bru.setEnvVar("petId", responseData.id)
-          bru.setEnvVar("status", responseData.status)
+          bru.setVar("petId", responseData.id)
+          bru.setVar("status", responseData.status)
         }
 
 settings:

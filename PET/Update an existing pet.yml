@@ -36,8 +36,8 @@ runtime:
         const responseData  = res.getBody();
 
         if(responseData && responseData.id){
-          bru.setEnvVar("category", responseData.category.name)
-          bru.setEnvVar("tag", responseData.tags[0].name)
+          bru.setVar("category", responseData.category.name)
+          bru.setVar("tag", responseData.tags[0].name)
         }
 
 settings:
