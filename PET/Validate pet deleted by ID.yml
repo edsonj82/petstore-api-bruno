@@ -1,0 +1,17 @@
+info:
+  name: Validate pet deleted by ID
+  type: http
+  seq: 11
+
+http:
+  method: GET
+  url: "{{baseURL}}/pet/{{petId}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Multiple status values can be provided with comma separated strings.

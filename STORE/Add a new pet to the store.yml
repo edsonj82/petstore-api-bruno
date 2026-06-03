@@ -1,0 +1,48 @@
+info:
+  name: Add a new pet to the store
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseURL}}/pet"
+  body:
+    type: json
+    data: |-
+      {
+        "id": 123456789,
+        "name": "Zoe",
+        "category": {
+          "id": 151515151,
+          "name": "Maltes"
+        },
+        "photoUrls": [
+          "photoUrl"
+        ],
+        "tags": [
+          {
+            "id": 131313131,
+            "name": "tags"
+          }
+        ],
+        "status": "available"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const responseData  = res.getBody();
+
+        if(responseData && responseData.id){
+          bru.setVar("petId", responseData.id)
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Create a new pet in the store

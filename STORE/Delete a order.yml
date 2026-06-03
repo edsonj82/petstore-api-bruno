@@ -1,0 +1,28 @@
+info:
+  name: Delete a order
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: "{{baseURL}}/store/order/{{orderId}}"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        // Remove os valores das variáveis do ambiente ativo do Bruno
+        //bru.deleteVar("orderId");
+        //bru.deleteVar("quantity");
+        //bru.deleteVar("shipDate");
+        //bru.deleteVar("status");
+        //bru.deleteVar("complete");
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Multiple status values can be provided with comma separated strings.

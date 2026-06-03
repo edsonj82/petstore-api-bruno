@@ -1,0 +1,27 @@
+info:
+  name: Delete a pet
+  type: http
+  seq: 7
+
+http:
+  method: DELETE
+  url: "{{baseURL}}/pet/{{petId}}"
+  body:
+    type: json
+    data: ""
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        // Remove os valores das variáveis do ambiente ativo do Bruno
+        //bru.deleteVar("petId");
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Create a new pet in the store

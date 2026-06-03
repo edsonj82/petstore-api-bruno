@@ -1,0 +1,52 @@
+info:
+  name: Place a new order for a pet
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseURL}}/store/order"
+  body:
+    type: json
+    data: |-
+      {
+        "id": 333333333,
+        "petId": {{petId}},
+        "quantity": 7,
+        "shipDate": "2026-06-03T12:40:26.504Z",//bug
+        "status": "approved",
+        "complete": true
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        //const agora = new Date().toISOString();
+        //const agora = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+
+        const dataAtual = new Date();
+        const dataFormatada = dataAtual.toISOString().replace(/\.\d+Z$/, 'Z');
+
+        bru.setEnvVar("datetime", dataFormatada);
+        bru.getEnvVar("datetime");
+    - type: after-response
+      code: |-
+        const responseData  = res.getBody();
+
+        if(responseData && responseData.id){
+          bru.setVar("orderId", responseData.id)
+          bru.setVar("quantity", responseData.quantity)
+          bru.setVar("shipDate", responseData.shipDate)
+          bru.setVar("status", responseData.status)
+          bru.setVar("complete", responseData.complete)
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Create a new pet in the store

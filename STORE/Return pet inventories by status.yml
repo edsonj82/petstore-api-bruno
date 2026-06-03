@@ -1,0 +1,17 @@
+info:
+  name: Return pet inventories by status
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseURL}}/store/inventory"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Create a new pet in the store
