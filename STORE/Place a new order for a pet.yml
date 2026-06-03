@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "id": 333333333,
+        "id": {{orderId}},
         "petId": {{petId}},
         "quantity": 7,
         "shipDate": "2026-06-03T12:40:26.504Z",//bug
@@ -23,20 +23,14 @@ runtime:
   scripts:
     - type: before-request
       code: |-
-        //const agora = new Date().toISOString();
-        //const agora = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
-
-        const dataAtual = new Date();
-        const dataFormatada = dataAtual.toISOString().replace(/\.\d+Z$/, 'Z');
-
-        bru.setEnvVar("datetime", dataFormatada);
-        bru.getEnvVar("datetime");
+        const orderIdRandom = Math.floor(Math.random() * 900000) + 1;
+        bru.setVar("orderId", orderIdRandom);
     - type: after-response
       code: |-
         const responseData  = res.getBody();
 
         if(responseData && responseData.id){
-          bru.setVar("orderId", responseData.id)
+          //bru.setVar("orderId", responseData.id)
           bru.setVar("quantity", responseData.quantity)
           bru.setVar("shipDate", responseData.shipDate)
           bru.setVar("status", responseData.status)

@@ -10,10 +10,10 @@ http:
     type: json
     data: |-
       {
-        "id": 123456789,
+        "id": {{petId}},
         "name": "Zoe",
         "category": {
-          "id": 151515151,
+          "id": {{categoryId}},
           "name": "Maltes"
         },
         "photoUrls": [
@@ -21,7 +21,7 @@ http:
         ],
         "tags": [
           {
-            "id": 131313131,
+            "id": {{tagId}},
             "name": "tags"
           }
         ],
@@ -31,13 +31,17 @@ http:
 
 runtime:
   scripts:
-    - type: after-response
+    - type: before-request
       code: |-
-        const responseData  = res.getBody();
+        // Gera um ID de pedido aleatório entre 1 e 900000
+        const petIdRandom = Math.floor(Math.random() * 900000) + 1;
+        bru.setVar("petId", petIdRandom);
 
-        if(responseData && responseData.id){
-          bru.setVar("petId", responseData.id)
-        }
+        //const categoryIdRandom = Math.floor(Math.random() * 900000) + 1;
+        //bru.setVar("categoryId", categoryIdRandom);
+
+        //const tagIdRandom = Math.floor(Math.random() * 900000) + 1;
+        //bru.setVar("tagId", tagIdRandom);
 
 settings:
   encodeUrl: true
