@@ -10,27 +10,64 @@ http:
     type: json
     data: |-
       {
-        "id": 123456789,
-        "name": "Zoe",
+        "id": "{{petId}}",
+        "name": "{{petName}}",
         "category": {
-          "id": 123456789,
-          "name": "Maltes"
+          "id": "{{categoryId}}",
+          "name": "{{petBreed}}"
         },
         "photoUrls": [
           "photoUrl"
         ],
         "tags": [
           {
-            "id": 123456789,
-            "name": "tags"
+            "id": "{{tagId}}",
+            "name": "{{petTags}}"
           }
         ],
-        "status": "available"
+        "status": "{{petStatus}}"
       }
   auth: inherit
 
 runtime:
   scripts:
+    - type: before-request
+      code: |-
+        //Gera um ID de pedido aleatório entre 1 e 900000
+
+        const petIdRandom = Math.floor(Math.random() * 900000000) + 1;
+        bru.setVar("petId", petIdRandom);
+
+        const categoryIdRandom = Math.floor(Math.random() * 900000000) + 1;
+        bru.setVar("categoryId", categoryIdRandom);
+
+        const tagIdRandom = Math.floor(Math.random() * 900000000) + 1;
+        bru.setVar("tagId", tagIdRandom);
+
+        // Matriz de Pets com Pares Fixos (Nome + Raça atrelados)
+        const petListValidate = [
+          { name: "Zoe", breed: "Maltes", tags: "maltes" },
+          { name: "Pepe", breed: "Dachshund", tags: "dachshund" },
+          { name: "Miny", breed: "Dachshund", tags: "dachshund" },
+          { name: "Charlie", breed: "Golden Retriever", tags: "golden" },
+          { name: "Max", breed: "Bulldog", tags: "bulldog" },
+          { name: "Luna", breed: "Persa", tags: "persa" },
+          { name: "Bella", breed: "Poodle", tags: "poodle" },
+          { name: "Rocky", breed: "Beagle", tags: "beagle" },
+          { name: "Molly", breed: "Siames", tags: "siames" },
+          { name: "Daisy", breed: "Labrador", tags: "labrador" }
+        ];
+
+        // Sorteia um único objeto completo da lista
+        const petRandom = petListValidate[Math.floor(Math.random() * petListValidate.length)];
+        // Salva as variáveis idênticas ao par sorteado
+        bru.setVar("petName", petRandom.name);
+        bru.setVar("petBreed", petRandom.breed);
+        bru.setVar("petTags", petRandom.tags);
+
+        const statusListValidate = [ "available", "pending", "sold"]
+        const statusRandom = statusListValidate[Math.floor(Math.random() * statusListValidate.length)];
+        bru.setVar("petStatus", statusRandom);
     - type: after-response
       code: |-
         const responseData  = res.getBody();
