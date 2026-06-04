@@ -8,6 +8,18 @@ http:
   url: "{{baseURL}}/pet/{{petId}}"
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        bru.deleteVar("petId");
+        bru.deleteVar("petName");
+        bru.deleteVar("categoryId");
+        bru.deleteVar("petBreed");
+        bru.deleteVar("tagId");
+        bru.deleteVar("petTags");
+        bru.deleteVar("petStatus");
+
 settings:
   encodeUrl: true
   timeout: 0

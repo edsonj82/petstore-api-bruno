@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{baseURL}}/pet/findByStatus?status={{status}}"
+  url: "{{baseURL}}/pet/findByStatus?status={{petStatus}}"
   params:
     - name: status
-      value: "{{status}}"
+      value: "{{petStatus}}"
       type: query
   auth: inherit
 

@@ -11,21 +11,6 @@ http:
     data: ""
   auth: inherit
 
-runtime:
-  scripts:
-    - type: after-response
-      code: |-
-        // Remove os valores das variáveis do ambiente ativo do Bruno
-        //bru.setEnvVar("petId", null);
-        //bru.setEnvVar("status", null);
-        //bru.setEnvVar("category", null);
-        //bru.setEnvVar("tag", null);
-
-        bru.deleteVar("petId");
-        bru.deleteVar("status");
-        bru.deleteVar("category");
-        bru.deleteVar("tag");
-
 settings:
   encodeUrl: true
   timeout: 0

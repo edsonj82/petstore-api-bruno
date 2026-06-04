@@ -72,10 +72,8 @@ runtime:
       code: |-
         const responseData  = res.getBody();
 
-        if(responseData && responseData.id){
+        if(responseData && responseData.id)
           bru.setVar("petId", responseData.id)
-          bru.setVar("status", responseData.status)
-        }
 
 settings:
   encodeUrl: true

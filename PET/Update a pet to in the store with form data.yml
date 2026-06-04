@@ -5,13 +5,13 @@ info:
 
 http:
   method: POST
-  url: "{{baseURL}}/pet/{{petId}}?name=Miny&status=available"
+  url: "{{baseURL}}/pet/{{petId}}?name={{petName}}&status={{petStatus}}"
   params:
     - name: name
-      value: Miny
+      value: "{{petName}}"
       type: query
     - name: status
-      value: available
+      value: "{{petStatus}}"
       type: query
   body:
     type: json
