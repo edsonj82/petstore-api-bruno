@@ -18,6 +18,77 @@ http:
     data: ""
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato real: O endpoint POST Form Data retorna o objeto do Pet
+        const petPostFormSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            category: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                name: { type: "string" }
+              },
+              required: ["id", "name"],
+              additionalProperties: false
+            },
+            name: { type: "string" },
+            photoUrls: {
+              type: "array",
+              items: { type: "string" }
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  name: { type: "string" }
+                  },
+                required: ["id", "name"],
+                additionalProperties: false
+              }
+            },
+            status: { type: "string" }
+          },
+          required: ["id", "category", "name", "photoUrls", "tags", "status"],
+          additionalProperties: false
+        };
+
+        // 2. Captura o corpo da resposta do servidor
+        const responseBody = res.getBody();
+
+        // 3. Compila e executa a validação do contrato
+        const validate = schemaValidator.compile(petPostFormSchema);
+        const isSchemaValid = validate(responseBody);
+
+        // 4. Asserts para o relatório de automação do Bruno
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("O contrato do JSON Schema (POST Form Data Pet) deve ser válido", function() {
+          if (!isSchemaValid) {
+            console.error("Erros encontrados no contrato do POST Form Data:", JSON.stringify(validate.errors, null, 2));
+          }
+          expect(isSchemaValid).to.be.true;
+        });
+
+        // 5. Teste funcional corrigido: Valida o ID diretamente na raiz do objeto do Pet
+        test("O ID do Pet retornado deve coincidir com o ID atualizado", function() {
+          const expectedPetId = bru.getVar("petId");
+          if (expectedPetId) {
+            expect(responseBody.id).to.equal(Number(expectedPetId));
+          }
+        });
+
 settings:
   encodeUrl: true
   timeout: 0
