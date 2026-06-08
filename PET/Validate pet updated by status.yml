@@ -67,15 +67,12 @@ runtime:
         const isSchemaValid = validate(responseBody);
 
         // 4. Asserts para o relatório de automação do Bruno
-        test("Status code deve ser 200 OK", function() {
-          expect(res.getStatus()).to.equal(200);
-        });
-
         test("O contrato do JSON Schema (Find by Status) deve ser válido", function() {
           expect(isSchemaValid).to.be.true;
           
           if (!isSchemaValid) {
-            console.error("Erros encontrados no contrato da lista por status:", validate.errors);
+            console.error("Erros encontrados no contrato da lista:", JSON.stringify(validate.errors, null, 2));
+            //console.error("Erros encontrados no contrato da lista por status:", validate.errors);
           }
         });
 
@@ -83,6 +80,63 @@ runtime:
         test("A resposta deve retornar uma lista populada de Pets", function() {
           expect(responseBody).to.be.an('array');
           expect(responseBody.length).to.be.above(0);
+        });
+    - type: tests
+      code: |-
+        const data = res.getBody();
+
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        // Validação do Content-Type
+        test("API returns the correct format (application/json)",function(){
+          const contentType = res.getHeader('content-type');
+          expect(contentType).to.include('application/json');
+        });
+
+        // Validação do Cache-Control
+        test("check if the caching policy is correct",function(){
+          const cacheControl = res.getHeader('cache-control');
+          // DICA: Caso sua API use uma política de cache por tempo, use a linha abaixo:
+          expect(cacheControl).to.not.be.null;
+          //expect(cacheControl).to.include('no-cache');// Se a API exigir dados dinâmicos (como a do Chuck Norris)
+        });
+
+        // Validação do Tempo de Resposta (Response Time)
+        test("validate if the server responds within an acceptable range",function(){
+          const responseTime = res.getResponseTime();
+          expect(responseTime).to.be.below(1500);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
+        })
+
+        // Validação de Existência e Estrutura de Campos Obrigatórios na Lista
+        test("validate the existence and values of required fields for each pet", function() {
+          // Garante primeiro que a resposta recebida é de fato uma lista populada
+          expect(data).to.be.an('array');
+          
+          // Se a lista tiver itens, valida a estrutura interna do primeiro pet (ou de todos)
+          if (data.length > 0) {
+            const firstPet = data[0]; // Foca a validação no primeiro objeto do array para amostragem
+
+            // Garante que o objeto do Pet possui as propriedades raiz
+            expect(firstPet).to.have.property('id');
+            expect(firstPet).to.have.property('name');
+            expect(firstPet).to.have.property('status');
+            expect(firstPet).to.have.property('photoUrls');
+            expect(firstPet).to.have.property('tags');  
+            
+            // Valida a subestrutura de 'category' apenas se ela existir no pet
+            if (firstPet.category) {
+              expect(firstPet.category).to.have.property('id');
+              expect(firstPet.category).to.have.property('name');
+            }
+
+            // Valida os itens de 'tags' apenas se a lista de tags não estiver vazia
+            if (firstPet.tags && firstPet.tags.length > 0) {
+              expect(firstPet.tags[0]).to.have.property('id');
+              expect(firstPet.tags[0]).to.have.property('name');
+            }
+          }
         });
 
 settings:
