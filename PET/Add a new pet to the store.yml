@@ -75,6 +75,66 @@ runtime:
         if(responseData && responseData.id)
           bru.setVar("petId", responseData.id)
 
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato estrito para o recurso Pet
+        const petPostSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            name: { type: "string" },
+            category: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                name: { type: "string" }
+              },
+              required: ["id", "name"],
+              additionalProperties: false
+            },
+            photoUrls: {
+              type: "array",
+              items: { type: "string" }
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  name: { type: "string" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false
+              }
+            },
+            status: { type: "string" }
+          },
+          required: ["id", "name", "category", "photoUrls", "tags", "status"],
+          additionalProperties: false
+        };
+
+        // 2. Captura o corpo da resposta do servidor
+        const responseBody = res.getBody();
+
+        // 3. Compila e executa a validação do contrato
+        const validate = schemaValidator.compile(petPostSchema);
+        const isSchemaValid = validate(responseBody);
+
+        // 4. Asserts para o relatório de automação do Bruno
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("O contrato do JSON Schema (POST Pet) deve ser válido", function() {
+          expect(isSchemaValid).to.be.true;
+          
+          if (!isSchemaValid) {
+            console.error("Erros encontrados no contrato do Pet:", validate.errors);
+          }
+        });
+
 settings:
   encodeUrl: true
   timeout: 0
