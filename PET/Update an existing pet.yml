@@ -65,6 +65,67 @@ runtime:
         const statusListValidate = [ "available", "pending", "sold"]
         const statusRandom = statusListValidate[Math.floor(Math.random() * statusListValidate.length)];
         bru.setVar("petStatus", statusRandom);
+    - type: after-response
+      code: |-
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato estrito para o retorno do PUT /pet
+        const petPutSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            category: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                name: { type: "string" }
+              },
+              required: ["id", "name"],
+              additionalProperties: false
+            },
+            name: { type: "string" },
+            photoUrls: {
+              type: "array",
+              items: { type: "string" }
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  name: { type: "string" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false
+              }
+            },
+            status: { type: "string" }
+          },
+          required: ["id", "category", "name", "photoUrls", "tags", "status"],
+          additionalProperties: false
+        };
+
+        // 2. Captura o corpo da resposta da API após a atualização
+        const responseBody = res.getBody();
+
+        // 3. Compila e executa a validação do contrato
+        const validate = schemaValidator.compile(petPutSchema);
+        const isSchemaValid = validate(responseBody);
+
+        // 4. Asserts para o relatório de automação do Bruno
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("O contrato do JSON Schema (PUT Pet) deve ser válido", function() {
+          expect(isSchemaValid).to.be.true;
+          
+          if (!isSchemaValid) {
+            console.error("Erros encontrados no contrato do PUT Pet:", validate.errors);
+          }
+        });
 
 settings:
   encodeUrl: true
