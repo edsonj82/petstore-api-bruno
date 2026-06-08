@@ -12,6 +12,93 @@ runtime:
   scripts:
     - type: after-response
       code: |-
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato de Sucesso (Objeto JSON do Pet)
+        const petGetSuccessSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            category: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                name: { type: "string" }
+              },
+              required: ["id", "name"],
+              additionalProperties: false
+            },
+            name: { type: ["string", "null"] }, // Permite null caso o registro esteja incompleto
+            photoUrls: {
+              type: "array",
+              items: { type: "string" }
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  name: { type: "string" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false
+              }
+            },
+            status: { type: "string" }
+          },
+          required: ["id", "photoUrls", "tags", "status"],
+          additionalProperties: false
+        };
+
+        const responseBody = res.getBody();
+        const statusCode = res.getStatus();
+
+        // 2. Fluxo Condicional de Validação de Contrato
+        if (statusCode === 200) {
+          
+          // Validação do JSON Schema para o Pet encontrado
+          const validate = schemaValidator.compile(petGetSuccessSchema);
+          const isSchemaValid = validate(responseBody);
+
+          test("Status code deve ser 200 OK", function() {
+            expect(statusCode).to.equal(200);
+          });
+
+          test("O contrato do JSON Schema (GET Pet por ID) deve ser válido", function() {
+            if (!isSchemaValid) {
+              console.error("Erros encontrados no contrato do GET:", JSON.stringify(validate.errors, null, 2));
+            }
+            expect(isSchemaValid).to.be.true;
+          });
+
+          test("O ID retornado deve ser o mesmo consultado na URL", function() {
+            const expectedPetId = bru.getVar("petId");
+            if (expectedPetId) {
+              expect(responseBody.id).to.equal(Number(expectedPetId));
+            }
+          });
+
+        } else if (statusCode === 404) {
+
+          // Validação do cenário de erro em Texto Puro (Plain Text)
+          test("Status code deve ser 404 Not Found", function() {
+            expect(statusCode).to.equal(404);
+          });
+
+          test("A resposta de erro deve vir no formato de texto esperado", function() {
+            expect(responseBody).to.be.a('string');
+            expect(responseBody).to.equal("Pet not found");
+          });
+
+        } else {
+          // Caso a API retorne qualquer outro status não mapeado (Ex: 500)
+          test("Resposta inesperada do servidor", function() {
+            fail("A API retornou o status incomum: " + statusCode);
+          });
+        }
+
         bru.deleteVar("petId");
         bru.deleteVar("petName");
         bru.deleteVar("categoryId");
