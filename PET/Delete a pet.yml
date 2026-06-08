@@ -30,7 +30,7 @@ runtime:
 
         test("O conteúdo do texto deve confirmar a exclusão do pet", function() {
           // Valida o contrato textual exato retornado pelo seu serviço
-          expect(responseBody).to.equal("Petdeleted");
+          expect(responseBody).to.equal("Pet deleted");
         });
 
 settings:
