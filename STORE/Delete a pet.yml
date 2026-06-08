@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: "{{baseURL}}/pet/{{petId}}"
+  url: "{{baseURL2}}/pet/{{petId}}"
   body:
     type: json
     data: ""

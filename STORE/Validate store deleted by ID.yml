@@ -5,8 +5,22 @@ info:
 
 http:
   method: GET
-  url: "{{baseURL}}/store/order/{{orderId}}"
+  url: "{{baseURL2}}/store/order/{{orderId}}"
   auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        // Remove os valores das variáveis do ambiente ativo do Bruno
+        bru.deleteVar("orderId");
+        bru.deleteVar("storeStatus");
+
+
+        bru.deleteVar("quantity");
+        bru.deleteVar("shipDate");
+        //bru.deleteVar("status");
+        bru.deleteVar("complete");
 
 settings:
   encodeUrl: true

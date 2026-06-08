@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: "{{baseURL}}/pet"
+  url: "{{baseURL2}}/pet"
   body:
     type: json
     data: |-
@@ -37,11 +37,11 @@ runtime:
         const petIdRandom = Math.floor(Math.random() * 900000) + 1;
         bru.setVar("petId", petIdRandom);
 
-        //const categoryIdRandom = Math.floor(Math.random() * 900000) + 1;
-        //bru.setVar("categoryId", categoryIdRandom);
+        const categoryIdRandom = Math.floor(Math.random() * 900000) + 1;
+        bru.setVar("categoryId", categoryIdRandom);
 
-        //const tagIdRandom = Math.floor(Math.random() * 900000) + 1;
-        //bru.setVar("tagId", tagIdRandom);
+        const tagIdRandom = Math.floor(Math.random() * 900000) + 1;
+        bru.setVar("tagId", tagIdRandom);
 
 settings:
   encodeUrl: true
