@@ -8,6 +8,79 @@ http:
   url: "{{baseURL}}/pet/{{petId}}"
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato estrito do GET /pet/{{petId}}
+        const petGetSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            category: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                name: { type: "string" }
+              },
+              required: ["id", "name"],
+              additionalProperties: false
+            },
+            name: { type: "string" },
+            photoUrls: {
+              type: "array",
+              items: { type: "string" }
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  name: { type: "string" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false
+              }
+            },
+            status: { type: "string" }
+          },
+          required: ["id", "category", "name", "photoUrls", "tags", "status"],
+          additionalProperties: false
+        };
+
+        // 2. Captura o corpo da resposta de consulta
+        const responseBody = res.getBody();
+
+        // 3. Compila e executa a validação do contrato JSON Schema
+        const validate = schemaValidator.compile(petGetSchema);
+        const isSchemaValid = validate(responseBody);
+
+        // 4. Asserts estruturais para o relatório de automação
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("O contrato do JSON Schema (GET Pet por ID) deve ser válido", function() {
+          expect(isSchemaValid).to.be.true;
+          
+          if (!isSchemaValid) {
+            console.error("Erros de conformidade encontrados no Schema:", validate.errors);
+          }
+        });
+
+        // 5. Teste funcional complementar de segurança
+        test("O ID do Pet retornado deve coincidir com o esperado", function() {
+          const expectedPetId = bru.getVar("petId");
+          // Só executa a validação dinâmica se a variável petId estiver populada no ambiente
+          if (expectedPetId) {
+            expect(responseBody.id).to.equal(Number(expectedPetId));
+          }
+        });
+
 settings:
   encodeUrl: true
   timeout: 0
