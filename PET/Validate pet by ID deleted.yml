@@ -1,0 +1,57 @@
+info:
+  name: Validate pet by ID deleted
+  type: http
+  seq: 10
+
+http:
+  method: GET
+  url: "{{baseURL}}/pet/{{petId}}"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        // Remove os valores das variáveis do ambiente ativo do Bruno
+        bru.deleteVar("petId");
+        //bru.deleteVar("petName");
+        bru.deleteVar("categoryId");
+        //bru.deleteVar("petBreed");
+        bru.deleteVar("tagId");
+        bru.deleteVar("petTags");
+        bru.deleteVar("petStatus");
+    - type: tests
+      code: |-
+        const data = res.getBody();
+
+        test("Status code deve ser 404 OK", function() {
+          expect(res.getStatus()).to.equal(404);
+        });
+
+        // Validação do Content-Type
+        test("API returns the correct format (application/json)",function(){
+          const contentType = res.getHeader('content-type');
+          expect(contentType).to.include('application/xml');
+        });
+
+        // Validação do Cache-Control
+        test("check if the caching policy is correct",function(){
+          const cacheControl = res.getHeader('cache-control');
+          // DICA: Caso sua API use uma política de cache por tempo, use a linha abaixo:
+          expect(cacheControl).to.not.be.null;
+          //expect(cacheControl).to.include('no-cache');// Se a API exigir dados dinâmicos (como a do Chuck Norris)
+        });
+
+        // Validação do Tempo de Resposta (Response Time)
+        test("validate if the server responds within an acceptable range",function(){
+          const responseTime = res.getResponseTime();
+          expect(responseTime).to.be.below(2000);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
+        })
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: Multiple status values can be provided with comma separated strings.
