@@ -1,22 +1,68 @@
 info:
-  name: Find purchase order by ID
+  name: Place a new order for a pet
   type: http
-  seq: 3
+  seq: 1
 
 http:
-  method: GET
-  url: "{{baseURL2}}/store/order/{{orderId}}"
+  method: POST
+  url: "{{baseURL2}}/store/order"
+  body:
+    type: json
+    data: |-
+      {
+        "id": "{{orderId}}",
+        "petId": "{{petId}}",
+        "quantity": 7,
+        "shipDate": "{{storeShipDate}}",
+        "status": "{{storeStatus}}",
+        "complete": true
+      }
   auth: inherit
 
 runtime:
   scripts:
+    - type: before-request
+      code: |-
+        const orderIdRandom = Math.floor(Math.random() * 900000) + 1;
+        bru.setVar("orderId", orderIdRandom);
+
+        const statusStoreListValidate = [ "placed", "approved", "delivered"]
+        const statusStoreRandom = statusStoreListValidate[Math.floor(Math.random() * statusStoreListValidate.length)];
+        bru.setVar("storeStatus", statusStoreRandom);
+
+
+        // 1. Obtém a data e hora atual do sistema (Local da execução)
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+
+        // 2. Extrai o horário atual em tempo real (Horário Local do Brasil)
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+
+        // 3. Monta a string com o horário do Brasil e o indicador de fuso -0300
+        const formattedTimestampBr = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+0000`;
+
+        // 4. Salva a variável dinâmica para o Bruno API
+        bru.setVar("storeShipDate", formattedTimestampBr);
     - type: after-response
       code: |-
+        const responseData  = res.getBody();
+
+        if(responseData && responseData.id && responseData.status){
+          bru.setVar("quantity", responseData.quantity)
+          bru.setVar("complete", responseData.complete)
+        }
+
         const ajv = require('ajv');
         const schemaValidator = new ajv({ allErrors: true });
 
-        // 1. Definição do contrato estrito para a consulta do pedido (Store Order)
-        const storeOrderGetSchema = {
+        // 1. Definição do contrato estrito para o recurso Store Order
+        const storeOrderPostSchema = {
           type: "object",
           properties: {
             id: { type: "integer" },
@@ -30,32 +76,19 @@ runtime:
           additionalProperties: false
         };
 
-        // 2. Captura o corpo da resposta e o status code do servidor
+        // 2. Captura o corpo da resposta do servidor
         const responseBody = res.getBody();
-        const statusCode = res.getStatus();
 
         // 3. Compila e executa a validação do contrato
-        const validate = schemaValidator.compile(storeOrderGetSchema);
+        const validate = schemaValidator.compile(storeOrderPostSchema);
         const isSchemaValid = validate(responseBody);
 
         // 4. Asserts para o relatório de automação do Bruno
-        test("Status code deve ser 200 OK", function () {
-          expect(statusCode).to.equal(200);
-        });
-
-        test("O contrato do JSON Schema (GET Store Order por ID) deve ser válido", function () {
+        test("O contrato do JSON Schema (POST Store Order) deve ser válido", function () {
           expect(isSchemaValid).to.be.true;
           
           if (!isSchemaValid) {
-            console.error("Erros encontrados no contrato do GET Order:", JSON.stringify(validate.errors, null, 2));
-          }
-        });
-
-        // 5. Validação funcional: Garante que o ID retornado é o mesmo que foi requisitado na URL
-        test("O ID do pedido retornado deve coincidir com o ID consultado", function () {
-          const expectedOrderId = bru.getVar("orderId");
-          if (expectedOrderId) {
-            expect(responseBody.id).to.equal(Number(expectedOrderId));
+            console.error("Erros encontrados no contrato do Order:", JSON.stringify(validate.errors, null, 2));
           }
         });
     - type: tests
@@ -102,4 +135,4 @@ settings:
   followRedirects: true
   maxRedirects: 5
 
-docs: Multiple status values can be provided with comma separated strings.
+docs: Create a new pet in the store

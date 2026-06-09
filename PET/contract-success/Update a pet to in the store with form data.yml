@@ -1,77 +1,32 @@
 info:
-  name: Update an existing pet
+  name: Update a pet to in the store with form data
   type: http
-  seq: 4
+  seq: 1
 
 http:
-  method: PUT
-  url: "{{baseURL2}}/pet"
+  method: POST
+  url: "{{baseURL2}}/pet/{{petId}}?name={{petName}}&status={{petStatus}}"
+  params:
+    - name: name
+      value: "{{petName}}"
+      type: query
+    - name: status
+      value: "{{petStatus}}"
+      type: query
   body:
     type: json
-    data: |-
-      {
-        "id": "{{petId}}",
-        "name": "{{petName}}",
-        "category": {
-          "id": "{{categoryId}}",
-          "name": "{{petBreed}}"
-        },
-        "photoUrls": [
-          "photoUrl"
-        ],
-        "tags": [
-          {
-            "id": "{{tagId}}",
-            "name": "{{petTags}}"
-          }
-        ],
-        "status": "{{petStatus}}"
-      }
+    data: ""
   auth: inherit
 
 runtime:
   scripts:
-    - type: before-request
-      code: |-
-        //Gera um ID de pedido aleatório entre 1 e 900000
-
-        const categoryIdRandom = Math.floor(Math.random() * 900000000) + 1;
-        bru.setVar("categoryId", categoryIdRandom);
-
-        const tagIdRandom = Math.floor(Math.random() * 900000000) + 1;
-        bru.setVar("tagId", tagIdRandom);
-
-        // Matriz de Pets com Pares Fixos (Nome + Raça atrelados)
-        const petListValidate = [
-          { name: "Zoe", breed: "Maltes", tags: "maltes" },
-          { name: "Pepe", breed: "Dachshund", tags: "dachshund" },
-          { name: "Miny", breed: "Dachshund", tags: "dachshund" },
-          { name: "Charlie", breed: "Golden Retriever", tags: "golden" },
-          { name: "Max", breed: "Bulldog", tags: "bulldog" },
-          { name: "Luna", breed: "Persa", tags: "persa" },
-          { name: "Bella", breed: "Poodle", tags: "poodle" },
-          { name: "Rocky", breed: "Beagle", tags: "beagle" },
-          { name: "Molly", breed: "Siames", tags: "siames" },
-          { name: "Daisy", breed: "Labrador", tags: "labrador" }
-        ];
-
-        // Sorteia um único objeto completo da lista
-        const petRandom = petListValidate[Math.floor(Math.random() * petListValidate.length)];
-        // Salva as variáveis idênticas ao par sorteado
-        bru.setVar("petName", petRandom.name);
-        bru.setVar("petBreed", petRandom.breed);
-        bru.setVar("petTags", petRandom.tags);
-
-        const statusListValidate = [ "available", "pending", "sold"]
-        const statusRandom = statusListValidate[Math.floor(Math.random() * statusListValidate.length)];
-        bru.setVar("petStatus", statusRandom);
     - type: after-response
       code: |-
         const ajv = require('ajv');
         const schemaValidator = new ajv({ allErrors: true });
 
-        // 1. Definição do contrato estrito para o retorno do PUT /pet
-        const petPutSchema = {
+        // 1. Definição do contrato real: O endpoint POST Form Data retorna o objeto do Pet
+        const petPostFormSchema = {
           type: "object",
           properties: {
             id: { type: "integer" },
@@ -96,7 +51,7 @@ runtime:
                 properties: {
                   id: { type: "integer" },
                   name: { type: "string" }
-                },
+                  },
                 required: ["id", "name"],
                 additionalProperties: false
               }
@@ -107,19 +62,26 @@ runtime:
           additionalProperties: false
         };
 
-        // 2. Captura o corpo da resposta da API após a atualização
+        // 2. Captura o corpo da resposta do servidor
         const responseBody = res.getBody();
 
         // 3. Compila e executa a validação do contrato
-        const validate = schemaValidator.compile(petPutSchema);
+        const validate = schemaValidator.compile(petPostFormSchema);
         const isSchemaValid = validate(responseBody);
 
         // 4. Asserts para o relatório de automação do Bruno
-        test("O contrato do JSON Schema (PUT Pet) deve ser válido", function() {
-          expect(isSchemaValid).to.be.true;
-          
+        test("O contrato do JSON Schema (POST Form Data Pet) deve ser válido", function() {
           if (!isSchemaValid) {
-            console.error("Erros encontrados no contrato do PUT Pet:", validate.errors);
+            console.error("Erros encontrados no contrato do POST Form Data:", JSON.stringify(validate.errors, null, 2));
+          }
+          expect(isSchemaValid).to.be.true;
+        });
+
+        // 5. Teste funcional corrigido: Valida o ID diretamente na raiz do objeto do Pet
+        test("O ID do Pet retornado deve coincidir com o ID atualizado", function() {
+          const expectedPetId = bru.getVar("petId");
+          if (expectedPetId) {
+            expect(responseBody.id).to.equal(Number(expectedPetId));
           }
         });
     - type: tests

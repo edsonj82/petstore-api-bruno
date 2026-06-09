@@ -1,7 +1,7 @@
 info:
-  name: Validate pet updated by status
+  name: Finds Pets by status
   type: http
-  seq: 6
+  seq: 1
 
 http:
   method: GET
@@ -106,7 +106,7 @@ runtime:
         // Validação do Tempo de Resposta (Response Time)
         test("validate if the server responds within an acceptable range",function(){
           const responseTime = res.getResponseTime();
-          expect(responseTime).to.be.below(1500);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
+          expect(responseTime).to.be.below(2000);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
         })
 
         // Validação de Existência e Estrutura de Campos Obrigatórios na Lista

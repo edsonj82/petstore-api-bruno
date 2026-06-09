@@ -1,22 +1,77 @@
 info:
-  name: Find pet by ID
+  name: Update an existing pet
   type: http
-  seq: 2
+  seq: 1
 
 http:
-  method: GET
-  url: "{{baseURL2}}/pet/{{petId}}"
+  method: PUT
+  url: "{{baseURL2}}/pet"
+  body:
+    type: json
+    data: |-
+      {
+        "id": "{{petId}}",
+        "name": "{{petName}}",
+        "category": {
+          "id": "{{categoryId}}",
+          "name": "{{petBreed}}"
+        },
+        "photoUrls": [
+          "photoUrl"
+        ],
+        "tags": [
+          {
+            "id": "{{tagId}}",
+            "name": "{{petTags}}"
+          }
+        ],
+        "status": "{{petStatus}}"
+      }
   auth: inherit
 
 runtime:
   scripts:
+    - type: before-request
+      code: |-
+        //Gera um ID de pedido aleatório entre 1 e 900000
+
+        const categoryIdRandom = Math.floor(Math.random() * 900000000) + 1;
+        bru.setVar("categoryId", categoryIdRandom);
+
+        const tagIdRandom = Math.floor(Math.random() * 900000000) + 1;
+        bru.setVar("tagId", tagIdRandom);
+
+        // Matriz de Pets com Pares Fixos (Nome + Raça atrelados)
+        const petListValidate = [
+          { name: "Zoe", breed: "Maltes", tags: "maltes" },
+          { name: "Pepe", breed: "Dachshund", tags: "dachshund" },
+          { name: "Miny", breed: "Dachshund", tags: "dachshund" },
+          { name: "Charlie", breed: "Golden Retriever", tags: "golden" },
+          { name: "Max", breed: "Bulldog", tags: "bulldog" },
+          { name: "Luna", breed: "Persa", tags: "persa" },
+          { name: "Bella", breed: "Poodle", tags: "poodle" },
+          { name: "Rocky", breed: "Beagle", tags: "beagle" },
+          { name: "Molly", breed: "Siames", tags: "siames" },
+          { name: "Daisy", breed: "Labrador", tags: "labrador" }
+        ];
+
+        // Sorteia um único objeto completo da lista
+        const petRandom = petListValidate[Math.floor(Math.random() * petListValidate.length)];
+        // Salva as variáveis idênticas ao par sorteado
+        bru.setVar("petName", petRandom.name);
+        bru.setVar("petBreed", petRandom.breed);
+        bru.setVar("petTags", petRandom.tags);
+
+        const statusListValidate = [ "available", "pending", "sold"]
+        const statusRandom = statusListValidate[Math.floor(Math.random() * statusListValidate.length)];
+        bru.setVar("petStatus", statusRandom);
     - type: after-response
       code: |-
         const ajv = require('ajv');
         const schemaValidator = new ajv({ allErrors: true });
 
-        // 1. Definição do contrato para um ÚNICO objeto Pet (Retorno por ID)
-        const petByIdSchema = {
+        // 1. Definição do contrato estrito para o retorno do PUT /pet
+        const petPutSchema = {
           type: "object",
           properties: {
             id: { type: "integer" },
@@ -52,23 +107,19 @@ runtime:
           additionalProperties: false
         };
 
-        // 2. Captura o corpo da resposta do servidor
+        // 2. Captura o corpo da resposta da API após a atualização
         const responseBody = res.getBody();
 
         // 3. Compila e executa a validação do contrato
-        const validate = schemaValidator.compile(petByIdSchema);
+        const validate = schemaValidator.compile(petPutSchema);
         const isSchemaValid = validate(responseBody);
 
         // 4. Asserts para o relatório de automação do Bruno
-        test("Status code deve ser 200 OK", function() {
-          expect(res.getStatus()).to.equal(200);
-        });
-
-        test("O contrato do JSON Schema (GET Pet by ID) deve ser válido", function() {
+        test("O contrato do JSON Schema (PUT Pet) deve ser válido", function() {
           expect(isSchemaValid).to.be.true;
           
           if (!isSchemaValid) {
-            console.error("Erros encontrados no contrato do Pet:", validate.errors);
+            console.error("Erros encontrados no contrato do PUT Pet:", validate.errors);
           }
         });
     - type: tests
@@ -119,4 +170,4 @@ settings:
   followRedirects: true
   maxRedirects: 5
 
-docs: Multiple status values can be provided with comma separated strings.
+docs: Create a new pet in the store

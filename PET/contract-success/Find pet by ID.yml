@@ -1,21 +1,11 @@
 info:
-  name: Update a pet to in the store with form data
+  name: Find pet by ID
   type: http
-  seq: 8
+  seq: 1
 
 http:
-  method: POST
-  url: "{{baseURL2}}/pet/{{petId}}?name={{petName}}&status={{petStatus}}"
-  params:
-    - name: name
-      value: "{{petName}}"
-      type: query
-    - name: status
-      value: "{{petStatus}}"
-      type: query
-  body:
-    type: json
-    data: ""
+  method: GET
+  url: "{{baseURL2}}/pet/{{petId}}"
   auth: inherit
 
 runtime:
@@ -25,8 +15,8 @@ runtime:
         const ajv = require('ajv');
         const schemaValidator = new ajv({ allErrors: true });
 
-        // 1. Definição do contrato real: O endpoint POST Form Data retorna o objeto do Pet
-        const petPostFormSchema = {
+        // 1. Definição do contrato para um ÚNICO objeto Pet (Retorno por ID)
+        const petByIdSchema = {
           type: "object",
           properties: {
             id: { type: "integer" },
@@ -51,7 +41,7 @@ runtime:
                 properties: {
                   id: { type: "integer" },
                   name: { type: "string" }
-                  },
+                },
                 required: ["id", "name"],
                 additionalProperties: false
               }
@@ -66,22 +56,19 @@ runtime:
         const responseBody = res.getBody();
 
         // 3. Compila e executa a validação do contrato
-        const validate = schemaValidator.compile(petPostFormSchema);
+        const validate = schemaValidator.compile(petByIdSchema);
         const isSchemaValid = validate(responseBody);
 
         // 4. Asserts para o relatório de automação do Bruno
-        test("O contrato do JSON Schema (POST Form Data Pet) deve ser válido", function() {
-          if (!isSchemaValid) {
-            console.error("Erros encontrados no contrato do POST Form Data:", JSON.stringify(validate.errors, null, 2));
-          }
-          expect(isSchemaValid).to.be.true;
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
         });
 
-        // 5. Teste funcional corrigido: Valida o ID diretamente na raiz do objeto do Pet
-        test("O ID do Pet retornado deve coincidir com o ID atualizado", function() {
-          const expectedPetId = bru.getVar("petId");
-          if (expectedPetId) {
-            expect(responseBody.id).to.equal(Number(expectedPetId));
+        test("O contrato do JSON Schema (GET Pet by ID) deve ser válido", function() {
+          expect(isSchemaValid).to.be.true;
+          
+          if (!isSchemaValid) {
+            console.error("Erros encontrados no contrato do Pet:", validate.errors);
           }
         });
     - type: tests
@@ -132,4 +119,4 @@ settings:
   followRedirects: true
   maxRedirects: 5
 
-docs: Create a new pet in the store
+docs: Multiple status values can be provided with comma separated strings.

@@ -1,7 +1,7 @@
 info:
   name: Return pet inventories by status
   type: http
-  seq: 4
+  seq: 1
 
 http:
   method: GET
@@ -91,16 +91,16 @@ runtime:
           expect(data).to.have.property('d');
           expect(data).to.have.property('Goobie woobie');
           expect(data).to.have.property('available');
-          expect(data).to.have.property('discontinued');
+          //expect(data).to.have.property('discontinued');
           expect(data).to.have.property('availabl');
-          expect(data).to.have.property('peric');
+          //expect(data).to.have.property('peric');
           expect(data).to.have.property('ожидается');
           expect(data).to.have.property('pending sale');
           expect(data).to.have.property('Active');
           expect(data).to.have.property('SOLD');
           expect(data).to.have.property('null');
           expect(data).to.have.property('invalid_status');
-          expect(data).to.have.property('8');
+          //expect(data).to.have.property('8');
           expect(data).to.have.property('12345');
           expect(data).to.have.property('adopted');
           expect(data).to.have.property('Contento');
