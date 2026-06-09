@@ -13,7 +13,7 @@ http:
         "id": "{{orderId}}",
         "petId": "{{petId}}",
         "quantity": 7,
-        "shipDate": "{{storeShipDate}}",//bug
+        "shipDate": "{{storeShipDate}}",
         "status": "{{storeStatus}}",
         "complete": true
       }
@@ -54,12 +54,80 @@ runtime:
         const responseData  = res.getBody();
 
         if(responseData && responseData.id && responseData.status){
-          //bru.setVar("orderId", responseData.id)
-          //bru.setVar("status", responseData.status)
           bru.setVar("quantity", responseData.quantity)
-          //bru.setVar("shipDate", responseData.shipDate)
           bru.setVar("complete", responseData.complete)
         }
+
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato estrito para o recurso Store Order
+        const storeOrderPostSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            petId: { type: "integer" },
+            quantity: { type: "integer" },
+            shipDate: { type: "string" },
+            status: { type: "string" },
+            complete: { type: "boolean" }
+          },
+          required: ["id", "petId", "quantity", "shipDate", "status", "complete"],
+          additionalProperties: false
+        };
+
+        // 2. Captura o corpo da resposta do servidor
+        const responseBody = res.getBody();
+
+        // 3. Compila e executa a validação do contrato
+        const validate = schemaValidator.compile(storeOrderPostSchema);
+        const isSchemaValid = validate(responseBody);
+
+        // 4. Asserts para o relatório de automação do Bruno
+        test("O contrato do JSON Schema (POST Store Order) deve ser válido", function () {
+          expect(isSchemaValid).to.be.true;
+          
+          if (!isSchemaValid) {
+            console.error("Erros encontrados no contrato do Order:", JSON.stringify(validate.errors, null, 2));
+          }
+        });
+    - type: tests
+      code: |-
+        const data = res.getBody();
+
+        test("Status code deve ser 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        // Validação do Content-Type
+        test("API returns the correct format (application/json)",function(){
+          const contentType = res.getHeader('content-type');
+          expect(contentType).to.include('application/json');
+        });
+
+        // Validação do Cache-Control
+        test("check if the caching policy is correct",function(){
+          const cacheControl = res.getHeader('cache-control');
+          // DICA: Caso sua API use uma política de cache por tempo, use a linha abaixo:
+          expect(cacheControl).to.not.be.null;
+          //expect(cacheControl).to.include('no-cache');// Se a API exigir dados dinâmicos (como a do Chuck Norris)
+        });
+
+        // Validação do Tempo de Resposta (Response Time)
+        test("validate if the server responds within an acceptable range",function(){
+          const responseTime = res.getResponseTime();
+          expect(responseTime).to.be.below(1500);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
+        })
+
+        test("validate the existence and values of required fields", function() {
+          // Garante que o campo existe (não é undefined ou null)
+          expect(data).to.have.property('id');
+          expect(data).to.have.property('petId');
+          expect(data).to.have.property('quantity');
+          expect(data).to.have.property('shipDate');
+          expect(data).to.have.property('status');
+          expect(data).to.have.property('complete');  
+        });
 
 settings:
   encodeUrl: true

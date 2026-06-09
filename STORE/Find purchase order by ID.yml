@@ -8,6 +8,57 @@ http:
   url: "{{baseURL2}}/store/order/{{orderId}}"
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const ajv = require('ajv');
+        const schemaValidator = new ajv({ allErrors: true });
+
+        // 1. Definição do contrato estrito para a consulta do pedido (Store Order)
+        const storeOrderGetSchema = {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            petId: { type: "integer" },
+            quantity: { type: "integer" },
+            shipDate: { type: "string" },
+            status: { type: "string" },
+            complete: { type: "boolean" }
+          },
+          required: ["id", "petId", "quantity", "shipDate", "status", "complete"],
+          additionalProperties: false
+        };
+
+        // 2. Captura o corpo da resposta e o status code do servidor
+        const responseBody = res.getBody();
+        const statusCode = res.getStatus();
+
+        // 3. Compila e executa a validação do contrato
+        const validate = schemaValidator.compile(storeOrderGetSchema);
+        const isSchemaValid = validate(responseBody);
+
+        // 4. Asserts para o relatório de automação do Bruno
+        test("Status code deve ser 200 OK", function () {
+          expect(statusCode).to.equal(200);
+        });
+
+        test("O contrato do JSON Schema (GET Store Order por ID) deve ser válido", function () {
+          expect(isSchemaValid).to.be.true;
+          
+          if (!isSchemaValid) {
+            console.error("Erros encontrados no contrato do GET Order:", JSON.stringify(validate.errors, null, 2));
+          }
+        });
+
+        // 5. Validação funcional: Garante que o ID retornado é o mesmo que foi requisitado na URL
+        test("O ID do pedido retornado deve coincidir com o ID consultado", function () {
+          const expectedOrderId = bru.getVar("orderId");
+          if (expectedOrderId) {
+            expect(responseBody.id).to.equal(Number(expectedOrderId));
+          }
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

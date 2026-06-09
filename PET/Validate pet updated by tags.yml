@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{baseURL}}/pet/findByTags?tags={{petTags}}"
+  url: "{{baseURL2}}/pet/findByTags?tags={{petTags}}"
   params:
     - name: tags
       value: "{{petTags}}"

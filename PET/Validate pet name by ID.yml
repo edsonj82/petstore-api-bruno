@@ -1,11 +1,11 @@
 info:
   name: Validate pet name by ID
   type: http
-  seq: 9
+  seq: 10
 
 http:
   method: GET
-  url: "{{baseURL}}/pet/{{petId}}"
+  url: "{{baseURL2}}/pet/{{petId}}"
   auth: inherit
 
 runtime:
