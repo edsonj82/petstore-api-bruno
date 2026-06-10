@@ -1,0 +1,36 @@
+info:
+  name: ID Invalid
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: "{{baseURL2}}/pet"
+  body:
+    type: json
+    data: |-
+      {
+        "id": "qwertpoiuy10",
+        "name": "doggie",
+        "category": {
+          "id": 1,
+          "name": "Dogs"
+        },
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "available"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

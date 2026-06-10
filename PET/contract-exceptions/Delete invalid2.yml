@@ -1,30 +1,21 @@
 info:
-  name: Delete a pet
+  name: Delete invalid2
   type: http
   seq: 10
 
 http:
   method: DELETE
-  url: "{{baseURL2}}/pet/{{petId}}"
+  url: "{{baseURL2}}/pet/qwqertpoiuy"
   body:
     type: json
     data: ""
   auth: inherit
 
 runtime:
+  variables:
+    - name: petId
+      value: ""
   scripts:
-    - type: after-response
-      code: |-
-        // 1. Captura o corpo da resposta do servidor
-        const responseBody = res.getBody();
-
-        // 2. Asserts para o relatório de automação do Bruno
-
-
-        test("O contrato de resposta deve ser do tipo string (Plain Text)", function() {
-          // Garante que o formato retornado permaneça como texto puro
-          expect(responseBody).to.be.a('string');
-        });
     - type: tests
       code: |-
         const responseBody = res.getBody();

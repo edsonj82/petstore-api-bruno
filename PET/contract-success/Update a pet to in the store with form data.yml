@@ -1,7 +1,7 @@
 info:
   name: Update a pet to in the store with form data
   type: http
-  seq: 1
+  seq: 4
 
 http:
   method: POST

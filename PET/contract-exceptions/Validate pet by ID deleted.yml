@@ -1,7 +1,7 @@
 info:
   name: Validate pet by ID deleted
   type: http
-  seq: 11
+  seq: 12
 
 http:
   method: GET
@@ -9,6 +9,9 @@ http:
   auth: inherit
 
 runtime:
+  variables:
+    - name: petId
+      value: ""
   scripts:
     - type: after-response
       code: |-
