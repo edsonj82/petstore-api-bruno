@@ -33,11 +33,10 @@ runtime:
   scripts:
     - type: tests
       code: |-
-        /*
         const data = res.getBody();
 
-        test("Status code deve ser 200 OK", function() {
-          expect(res.getStatus()).to.equal(200);
+        test("Status code deve ser 500 Internal Server Error", function() {
+          expect(res.getStatus()).to.equal(500);
         });
 
         // Validação do Content-Type
@@ -54,26 +53,12 @@ runtime:
           //expect(cacheControl).to.include('no-cache');// Se a API exigir dados dinâmicos (como a do Chuck Norris)
         });
 
+
         // Validação do Tempo de Resposta (Response Time)
         test("validate if the server responds within an acceptable range",function(){
           const responseTime = res.getResponseTime();
           expect(responseTime).to.be.below(1500);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
         })
-
-        test("validate the existence and values of required fields", function() {
-          // Garante que o campo existe (não é undefined ou null)
-          expect(data).to.have.property('id');
-          expect(data).to.have.property('category');
-          expect(data.category).to.have.property('id');
-          expect(data.category).to.have.property('name');
-          expect(data).to.have.property('name');
-          expect(data).to.have.property('photoUrls');
-          expect(data).to.have.property('tags');  
-          expect(data.tags[0]).to.have.property('id');
-          expect(data.tags[0]).to.have.property('name');
-          expect(data).to.have.property('status');
-        });
-        */
 
 settings:
   encodeUrl: true
