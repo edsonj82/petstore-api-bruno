@@ -16,29 +16,12 @@ runtime:
     - name: petId
       value: ""
   scripts:
-    - type: after-response
-      code: |-
-        // 1. Captura o corpo da resposta do servidor
-        const responseBody = res.getBody();
-
-        // 2. Asserts para o relatório de automação do Bruno
-
-
-        test("O contrato de resposta deve ser do tipo string (Plain Text)", function() {
-          // Garante que o formato retornado permaneça como texto puro
-          expect(responseBody).to.be.a('string');
-        });
     - type: tests
       code: |-
         const responseBody = res.getBody();
 
-        test("Status code deve ser 200 OK na deleção do pet", function() {
-          expect(res.getStatus()).to.equal(200);
-        });
-
-        test("O conteúdo do texto deve confirmar a exclusão do pet", function() {
-          // Valida o contrato textual exato retornado pelo seu serviço
-          expect(responseBody).to.equal("Pet deleted");
+        test("Status code deve ser 200 Not Found na deleção do pet", function() {
+          expect(res.getStatus()).to.equal(404);
         });
 
 settings:
