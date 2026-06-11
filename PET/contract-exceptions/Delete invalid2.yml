@@ -20,13 +20,8 @@ runtime:
       code: |-
         const responseBody = res.getBody();
 
-        test("Status code deve ser 200 OK na deleção do pet", function() {
-          expect(res.getStatus()).to.equal(200);
-        });
-
-        test("O conteúdo do texto deve confirmar a exclusão do pet", function() {
-          // Valida o contrato textual exato retornado pelo seu serviço
-          expect(responseBody).to.equal("Pet deleted");
+        test("Status code deve ser 200 Not Found na deleção do pet", function() {
+          expect(res.getStatus()).to.equal(404);
         });
 
 settings:
