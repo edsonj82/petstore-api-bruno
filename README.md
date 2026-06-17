@@ -32,9 +32,9 @@ A arquitetura das coleções foi modularizada por domínios de negócio e dividi
 
 ## 🧪 Cobertura de Cenários Detalhada
 ### 🐶 Domínio: PET
-    * **contract-success:** Criação de Pet, Atualização (via PUT e Form Data), Busca por ID, Filtro por Status/Tags e Deleção limpa.
+* **contract-success:** Criação de Pet, Atualização (via PUT e Form Data), Busca por ID, Filtro por Status/Tags e Deleção limpa.
 
-    * **contract-exceptions:** Validações de payload com ID empty, ID invalid, Status empty e comportamento do servidor ao buscar IDs já deletados.
+* **contract-exceptions:** Validações de payload com ID empty, ID invalid, Status empty e comportamento do servidor ao buscar IDs já deletados.
 
 ### 🛒 Domínio: STORE
 * **contract-success:** Criação de pedidos, Busca de pedidos por ID, Consulta dinâmica de inventário por status e deleção de ordens de compra.
@@ -68,13 +68,13 @@ bru run PET/contract-exceptions --env <nome-do-seu-ambiente>
 ## 📊 Relatórios e Asserções Técnicas
 Cada arquivo de teste executa asserções organizadas em 4 pilares cruciais:
 
-**Verificação de Infraestrutura:** Tempo de resposta do servidor inferior a 1500ms e presença correta do header Cache-Control.
+* **Verificação de Infraestrutura:** Tempo de resposta do servidor inferior a 1500ms e presença correta do header Cache-Control.
 
-**Código de Status HTTP:** Respostas semânticas (200 OK para fluxos felizes, 400 Bad Request ou 404 Not Found para cenários controlados de exceção).
+* **Código de Status HTTP:** Respostas semânticas (200 OK para fluxos felizes, 400 Bad Request ou 404 Not Found para cenários controlados de exceção).
 
-**Validação de Tipo do Content-Type:** Garantia de tratamento do formato (application/json ou text/plain quando aplicável).
+* **Validação de Tipo do Content-Type:** Garantia de tratamento do formato (application/json ou text/plain quando aplicável).
 
-**Contrato Estrito:** Compilação via biblioteca AJV garantindo que propriedades novas ou ausentes quebrem o teste em caso de alteração no backend (additionalProperties: false).
+* **Contrato Estrito:** Compilação via biblioteca AJV garantindo que propriedades novas ou ausentes quebrem o teste em caso de alteração no backend (additionalProperties: false).
 
 Se precisar ajustar os comandos de execução de acordo com o nome exato do arquivo `.env` salvo na sua pasta `environments`, basta alterar a flag `--env`.
 
