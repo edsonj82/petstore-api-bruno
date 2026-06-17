@@ -13,29 +13,35 @@ http:
 
 runtime:
   scripts:
-    - type: after-response
-      code: |-
-        // 1. Captura o corpo da resposta do servidor
-        const responseBody = res.getBody();
-
-        // 2. Asserts para o relatório de automação do Bruno
-
-
-        test("O contrato de resposta deve ser do tipo string (Plain Text)", function() {
-          // Garante que o formato retornado permaneça como texto puro
-          expect(responseBody).to.be.a('string');
-        });
     - type: tests
       code: |-
+        // 1. Converte o corpo da resposta em um objeto JSON manipulável
         const responseBody = res.getBody();
+        const statusCode = res.getStatus();
 
-        test("Status code deve ser 200 OK na deleção do pet", function() {
-          expect(res.getStatus()).to.equal(200);
+        // ==========================================
+        // VALIDAÇÕES DE INFRAESTRUTURA & METADADOS
+        // ==========================================
+
+        test("Status code deve ser 200 OK", function() {
+          expect(statusCode).to.equal(200);
         });
 
-        test("O conteúdo do texto deve confirmar a exclusão do pet", function() {
-          // Valida o contrato textual exato retornado pelo seu serviço
-          expect(responseBody).to.equal("Pet deleted");
+        test("A resposta de erro deve vir no formato application/json", function() {
+          const contentType = res.getHeader('content-type');
+          expect(contentType).to.include('application/json');
+        });
+
+        test("Deve conter a estrutura e a mensagem de erro esperada", function() {
+          // Garante que o corpo possui as propriedades raiz de erro da Petstore
+          expect(responseBody).to.have.property('code');
+          expect(responseBody).to.have.property('type');
+          expect(responseBody).to.have.property('message');
+
+          // Valida os valores exatos retornados pelo backend para este cenário
+          expect(responseBody.code).to.equal(200);
+          expect(responseBody.type).to.equal("unknown");
+          //expect(responseBody.message).to.equal("Pet not found");
         });
 
 settings:

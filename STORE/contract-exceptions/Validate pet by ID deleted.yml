@@ -48,6 +48,26 @@ runtime:
           expect(responseTime).to.be.below(2000);// Define o limite máximo tolerável em milissegundos (ex: 1500ms = 1.5s)
         })
 
+        // 1. Converte o corpo da resposta em um objeto JSON manipulável
+        const responseBody = res.getBody();
+        const statusCode = res.getStatus();
+
+        // ==========================================
+        // VALIDAÇÕES DE INFRAESTRUTURA & METADADOS
+        // ==========================================
+
+        test("Deve conter a estrutura e a mensagem de erro esperada", function() {
+          // Garante que o corpo possui as propriedades raiz de erro da Petstore
+          expect(responseBody).to.have.property('code');
+          expect(responseBody).to.have.property('type');
+          expect(responseBody).to.have.property('message');
+
+          // Valida os valores exatos retornados pelo backend para este cenário
+          expect(responseBody.code).to.equal(1);
+          expect(responseBody.type).to.equal("unknown");
+          expect(responseBody.message).to.equal("Pet not found");
+        });
+
 settings:
   encodeUrl: true
   timeout: 0
