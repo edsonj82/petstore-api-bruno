@@ -1,7 +1,7 @@
 info:
   name: Find purchase order by ID
   type: http
-  seq: 1
+  seq: 3
 
 http:
   method: GET

@@ -1,7 +1,7 @@
 info:
   name: Validate pet by ID deleted
   type: http
-  seq: 7
+  seq: 9
 
 http:
   method: GET

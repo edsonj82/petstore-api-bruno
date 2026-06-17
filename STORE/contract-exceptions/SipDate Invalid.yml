@@ -1,7 +1,7 @@
 info:
-  name: Place a new order for a pet
+  name: SipDate Invalid
   type: http
-  seq: 2
+  seq: 5
 
 http:
   method: POST
@@ -13,7 +13,7 @@ http:
         "id": "{{orderId}}",
         "petId": "{{petId}}",
         "quantity": 7,
-        "shipDate": "{{storeShipDate}}",
+        "shipDate": "as/as/qwqw",
         "status": "{{storeStatus}}",
         "complete": true
       }

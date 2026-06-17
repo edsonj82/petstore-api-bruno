@@ -1,7 +1,7 @@
 info:
-  name: Place a new order for a pet
+  name: "StoreId Invalid "
   type: http
-  seq: 2
+  seq: 3
 
 http:
   method: POST
@@ -10,11 +10,11 @@ http:
     type: json
     data: |-
       {
-        "id": "{{orderId}}",
-        "petId": "{{petId}}",
+        "id": "klhgkjghkjh",
+        "petId": "",
         "quantity": 7,
-        "shipDate": "{{storeShipDate}}",
-        "status": "{{storeStatus}}",
+        "shipDate": "",
+        "status": "",
         "complete": true
       }
   auth: inherit

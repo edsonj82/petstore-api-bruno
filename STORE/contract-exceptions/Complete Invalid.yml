@@ -1,7 +1,7 @@
 info:
-  name: Place a new order for a pet
+  name: Complete Invalid
   type: http
-  seq: 2
+  seq: 6
 
 http:
   method: POST
@@ -15,7 +15,7 @@ http:
         "quantity": 7,
         "shipDate": "{{storeShipDate}}",
         "status": "{{storeStatus}}",
-        "complete": true
+        "complete": "0"
       }
   auth: inherit
 

@@ -1,7 +1,7 @@
 info:
   name: Return pet inventories by status
   type: http
-  seq: 1
+  seq: 4
 
 http:
   method: GET
